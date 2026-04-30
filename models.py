@@ -1,51 +1,17 @@
-"""Модуль с моделью данных для показаний счётчиков."""
-
 import dataclasses
 from datetime import date
 
-
 @dataclasses.dataclass(frozen=True)
 class CounterReading:
-  """Представляет одно показание счётчика.
+    resource_type: str
+    date: date
+    value: float
+    quality: str
 
-  Attributes:
-    resource_type: Название ресурса.
-    date: Объект даты замера.
-    value: Числовое значение показания.
-  """
+    def __str__(self) -> str:
+        return f"{self.resource_type} | {self.date} | {self.value} | {self.quality}"
 
-  resource_type: str
-  date: date
-  value: float
-
-  def __str__(self) -> str:
-    return (
-        f"Тип ресурса: {self.resource_type}\n"
-        f"Дата:       {self.date:%d.%m.%Y}\n"
-        f"Значение:   {self.value:,.2f}"
-    )
-
-
-def parse_reading_parts(
-    resource_type: str,
-    date_str: str,
-    value_str: str,
-) -> CounterReading:
-  """Создаёт объект CounterReading из строковых компонентов.
-
-  Args:
-    resource_type: Название ресурса (например, "Горячая вода").
-    date_str: Дата в формате YYYY.MM.DD или YYYY-MM-DD.
-    value_str: Значение с возможной запятой как разделителем.
-
-  Returns:
-    Готовый объект CounterReading.
-
-  Raises:
-    ValueError: Некорректный формат даты или значения.
-  """
-  normalized_date = date_str.replace(".", "-")
-  dt = date.fromisoformat(normalized_date)
-  value = float(value_str.replace(",", "."))
-
-  return CounterReading(resource_type, dt, value)
+def parse_reading_parts(res_type: str, date_str: str, val_str: str, quality: str = "Норма") -> CounterReading:
+    dt = date.fromisoformat(date_str.replace(".", "-"))
+    val = float(val_str.replace(",", "."))
+    return CounterReading(res_type.strip(), dt, val, quality.strip())
